@@ -58,7 +58,7 @@ def get_restaurante_por_id(restaurante_id):
     return {"error": "Restaurante no existe"}, 404
 
 
-# Obtener todos los restaurantes o filtrar por query parameters
+# Obtener todos los restaurantes o filtrar por query parameter
 @app.route('/restaurantes', methods=['GET'])
 def get_todos_restaurantes():    
     
@@ -69,17 +69,16 @@ def get_todos_restaurantes():
     
     print(f"Query params recibidos - tipo: {tipo_param}, calificacion: {calificacion_param}, ubicacion: {ubicacion_param}")
     
-    # Comenzar con todos los restaurantes
-    resultado = restaurantes.copy()
+    resultado = restaurantes
     
-    # Filtrar por tipo de cocina (case insensitive)
+    # Filtro por tipo
     if tipo_param:
         resultado = list(filter(
             lambda r: r["tipo"].lower() == tipo_param.lower(), 
             resultado
         ))
     
-    # Filtrar por calificación mínima
+    # Filtro por calificación 
     if calificacion_param:
         try:
             calificacion_min = float(calificacion_param)
@@ -90,7 +89,7 @@ def get_todos_restaurantes():
         except ValueError:
             return {"error": "Calificación debe ser un número válido"}, 400
     
-    # Filtrar por ubicación (case insensitive)
+    # Filtro por ubicación 
     if ubicacion_param:
         resultado = list(filter(
             lambda r: r["ubicacion"].lower() == ubicacion_param.lower(), 
@@ -103,22 +102,17 @@ def get_todos_restaurantes():
     return {"total": len(resultado), "restaurantes": resultado}, 200
 
 
-# ENDPOINT 3: POST crear un nuevo restaurante
+# ENDPOINT 3: POST crear nuevo restaurante
 @app.route('/restaurantes', methods=['POST'])
 def crear_restaurante():
     global restaurantes
     data = request.get_json()
-    
-    # Validar que se envió data
-    if not data:
-        return {"error": "No se envió información"}, 400
-    
+
     # Validar campos requeridos
     campos_requeridos = ["nombre", "tipo", "ubicacion", "calificacion", "precio_promedio"]
     for campo in campos_requeridos:
         if campo not in data:
-            return {"error": f"El campo '{campo}' es requerido"}, 400
-    
+            return {"error": f"El campo '{campo}' es requerido"}, 400    
 
     id = len(restaurantes) + 1
     # Crear nuevo restaurante
@@ -131,7 +125,6 @@ def crear_restaurante():
         "precio_promedio": data["precio_promedio"]
     }
     
-    # Agregar al diccionario
     restaurantes.append(nuevo_restaurante)
     
     print(f"Nuevo restaurante creado: {nuevo_restaurante}")
@@ -142,17 +135,13 @@ def crear_restaurante():
     }, 201
 
 
-# ENDPOINT 4: DELETE eliminar un restaurante por ID
+# ENDPOINT 4: Eliminar un restaurante por ID
 @app.route('/restaurantes/<int:restaurante_id>', methods=['DELETE'])
 def eliminar_restaurante(restaurante_id):
+    global restaurantes
     
-    # Buscar el restaurante
-    restaurante_encontrado = None
-    for r in restaurantes:
-        if r["id"] == restaurante_id:
-            restaurante_encontrado = r
-            break
-    
+    restaurante_encontrado = list(filter(lambda r: r["id"] == restaurante_id, restaurantes))
+
     if not restaurante_encontrado:
         return {"error": "Restaurante no encontrado"}, 404
     
@@ -162,7 +151,7 @@ def eliminar_restaurante(restaurante_id):
     print(f"Restaurante eliminado: {restaurante_encontrado}")
     
     return {
-        "mensaje": "Restaurante eliminado exitosamente",
+        "mensaje": "Restaurante eliminado",
         "restaurante_eliminado": restaurante_encontrado
     }, 200
 
