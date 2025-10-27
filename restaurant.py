@@ -102,7 +102,7 @@ def get_todos_restaurantes():
     return {"total": len(resultado), "restaurantes": resultado}, 200
 
 
-# ENDPOINT 3: POST crear nuevo restaurante
+# POST crear nuevo restaurante
 @app.route('/restaurantes', methods=['POST'])
 def crear_restaurante():
     global restaurantes
@@ -135,7 +135,7 @@ def crear_restaurante():
     }, 201
 
 
-# ENDPOINT 4: Eliminar un restaurante por ID
+# Delete: Eliminar un restaurante por ID
 @app.route('/restaurantes/<int:restaurante_id>', methods=['DELETE'])
 def eliminar_restaurante(restaurante_id):
     global restaurantes
